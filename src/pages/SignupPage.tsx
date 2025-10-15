@@ -6,6 +6,7 @@ import {Input} from "../components/ui/input";
 import {Label} from "../components/ui/label";
 import {Separator} from "../components/ui/separator";
 import {useAppwriteAuth} from "../contexts/AppwriteAuthContext";
+import {toast} from "sonner";
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -17,22 +18,97 @@ export default function SignupPage() {
     phone: "",
     password: "",
   });
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
+
+  const validateForm = () => {
+    const newErrors: {[key: string]: string} = {};
+
+    // Name validation
+    if (!formData.name.trim()) {
+      newErrors.name = "Full name is required";
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = "Name must be at least 2 characters";
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    // Phone validation (UAE format)
+    const phoneRegex = /^(\+971|971|0)?[5][0-9]{8}$/;
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Phone number is required";
+    } else if (!phoneRegex.test(formData.phone.replace(/\s/g, ""))) {
+      newErrors.phone = "Please enter a valid UAE phone number";
+    }
+
+    // Password validation
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
+    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+      newErrors.password =
+        "Password must contain uppercase, lowercase, and numbers";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      toast.error("Please fix the errors in the form");
+      return;
+    }
+
     try {
-      await signUp(formData.email, formData.password, formData.name);
+      const user = await signUp(
+        formData.email,
+        formData.password,
+        formData.name
+      );
+
+      toast.success("🎉 Account created successfully!", {
+        description: "Welcome to AL-Kabir! Your account has been created.",
+        duration: 4000,
+      });
+
+      // Navigate to dashboard after successful signup
       navigate("/dashboard");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Signup error:", error);
+
+      // Handle specific Appwrite errors
+      if (error.code === 409) {
+        toast.error("Account already exists", {
+          description:
+            "An account with this email already exists. Try signing in instead.",
+        });
+        setErrors({email: "This email is already registered"});
+      } else if (error.code === 400) {
+        toast.error("Invalid information", {
+          description: "Please check your information and try again.",
+        });
+      } else {
+        toast.error("Signup failed", {
+          description: "Something went wrong. Please try again.",
+        });
+      }
     }
   };
 
   const handleSocialSignup = (provider: string) => {
-    // Social signup will be configured in Supabase dashboard
-    console.log(
-      `Social signup with ${provider} - requires Supabase configuration`
-    );
+    // Social signup will be configured in Appwrite dashboard
+    toast.info(`${provider} signup`, {
+      description: "Social authentication will be available soon!",
+    });
   };
 
   return (
@@ -132,13 +208,21 @@ export default function SignupPage() {
                   type='text'
                   required
                   placeholder='John Doe'
-                  className='pl-10 h-12 border-2 border-border bg-background focus:border-emerald-500 dark:focus:border-emerald-400 transition-colors'
+                  className={`pl-10 h-12 border-2 bg-background focus:border-emerald-500 dark:focus:border-emerald-400 transition-colors ${
+                    errors.name
+                      ? "border-red-500 focus:border-red-500"
+                      : "border-border"
+                  }`}
                   value={formData.name}
-                  onChange={(e) =>
-                    setFormData({...formData, name: e.target.value})
-                  }
+                  onChange={(e) => {
+                    setFormData({...formData, name: e.target.value});
+                    if (errors.name) setErrors({...errors, name: ""});
+                  }}
                 />
               </div>
+              {errors.name && (
+                <p className='text-sm text-red-500 mt-1'>{errors.name}</p>
+              )}
             </div>
 
             <div>
@@ -152,13 +236,21 @@ export default function SignupPage() {
                   type='email'
                   required
                   placeholder='your@email.com'
-                  className='pl-10 h-12 border-2 border-border bg-background focus:border-emerald-500 dark:focus:border-emerald-400 transition-colors'
+                  className={`pl-10 h-12 border-2 bg-background focus:border-emerald-500 dark:focus:border-emerald-400 transition-colors ${
+                    errors.email
+                      ? "border-red-500 focus:border-red-500"
+                      : "border-border"
+                  }`}
                   value={formData.email}
-                  onChange={(e) =>
-                    setFormData({...formData, email: e.target.value})
-                  }
+                  onChange={(e) => {
+                    setFormData({...formData, email: e.target.value});
+                    if (errors.email) setErrors({...errors, email: ""});
+                  }}
                 />
               </div>
+              {errors.email && (
+                <p className='text-sm text-red-500 mt-1'>{errors.email}</p>
+              )}
             </div>
 
             <div>
@@ -172,13 +264,21 @@ export default function SignupPage() {
                   type='tel'
                   required
                   placeholder='+971 50 123 4567'
-                  className='pl-10 h-12 border-2 border-border bg-background focus:border-emerald-500 dark:focus:border-emerald-400 transition-colors'
+                  className={`pl-10 h-12 border-2 bg-background focus:border-emerald-500 dark:focus:border-emerald-400 transition-colors ${
+                    errors.phone
+                      ? "border-red-500 focus:border-red-500"
+                      : "border-border"
+                  }`}
                   value={formData.phone}
-                  onChange={(e) =>
-                    setFormData({...formData, phone: e.target.value})
-                  }
+                  onChange={(e) => {
+                    setFormData({...formData, phone: e.target.value});
+                    if (errors.phone) setErrors({...errors, phone: ""});
+                  }}
                 />
               </div>
+              {errors.phone && (
+                <p className='text-sm text-red-500 mt-1'>{errors.phone}</p>
+              )}
             </div>
 
             <div>
@@ -192,11 +292,16 @@ export default function SignupPage() {
                   type={showPassword ? "text" : "password"}
                   required
                   placeholder='Create a strong password'
-                  className='pl-10 pr-10 h-12 border-2 border-border bg-background focus:border-emerald-500 dark:focus:border-emerald-400 transition-colors'
+                  className={`pl-10 pr-10 h-12 border-2 bg-background focus:border-emerald-500 dark:focus:border-emerald-400 transition-colors ${
+                    errors.password
+                      ? "border-red-500 focus:border-red-500"
+                      : "border-border"
+                  }`}
                   value={formData.password}
-                  onChange={(e) =>
-                    setFormData({...formData, password: e.target.value})
-                  }
+                  onChange={(e) => {
+                    setFormData({...formData, password: e.target.value});
+                    if (errors.password) setErrors({...errors, password: ""});
+                  }}
                 />
                 <button
                   type='button'
@@ -209,8 +314,11 @@ export default function SignupPage() {
                   )}
                 </button>
               </div>
+              {errors.password && (
+                <p className='text-sm text-red-500 mt-1'>{errors.password}</p>
+              )}
               <p className='text-xs text-muted-foreground mt-1'>
-                Minimum 8 characters
+                Must contain uppercase, lowercase, and numbers (8+ chars)
               </p>
             </div>
 
@@ -218,8 +326,17 @@ export default function SignupPage() {
               type='submit'
               className='w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 h-12 text-base text-white shadow-lg hover:shadow-xl transition-all duration-300 btn-hover-lift'
               disabled={loading}>
-              Create Account
-              <ArrowRight className='w-5 h-5 ml-2' />
+              {loading ? (
+                <>
+                  <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2' />
+                  Creating Account...
+                </>
+              ) : (
+                <>
+                  Create Account
+                  <ArrowRight className='w-5 h-5 ml-2' />
+                </>
+              )}
             </Button>
 
             <p className='text-xs text-muted-foreground text-center'>
