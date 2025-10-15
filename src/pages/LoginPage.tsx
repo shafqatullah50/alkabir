@@ -6,26 +6,108 @@ import {Input} from "../components/ui/input";
 import {Label} from "../components/ui/label";
 import {Separator} from "../components/ui/separator";
 import {useAppwriteAuth} from "../contexts/AppwriteAuthContext";
+import {toast} from "sonner";
 
-export default function LoginPage() {
-  const navigate = useNavigate();
-  const {signIn, loading} = useAppwriteAuth();
+const LoginPage = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({
     email: "",
     password: "",
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await signIn(formData.email, formData.password);
-      navigate("/dashboard");
-    } catch (error) {
-      console.error("Login error:", error);
+  const {signIn} = useAppwriteAuth();
+  const navigate = useNavigate();
+
+  // Validation functions
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Real-time validation
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    if (value && !validateEmail(value)) {
+      setErrors((prev) => ({
+        ...prev,
+        email: "Please enter a valid email address",
+      }));
+    } else {
+      setErrors((prev) => ({...prev, email: ""}));
     }
   };
 
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    if (value && value.length < 6) {
+      setErrors((prev) => ({
+        ...prev,
+        password: "Password must be at least 6 characters",
+      }));
+    } else {
+      setErrors((prev) => ({...prev, password: ""}));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {
+      email: "",
+      password: "",
+    };
+
+    if (!email) {
+      newErrors.email = "Email is required";
+    } else if (!validateEmail(email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    if (!password) {
+      newErrors.password = "Password is required";
+    } else if (password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+
+    setErrors(newErrors);
+    return !Object.values(newErrors).some((error) => error !== "");
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      toast.error("Please fix the errors before submitting");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await signIn(email, password);
+      toast.success("Login successful! Welcome back!");
+      navigate("/"); // Redirect to home or dashboard
+    } catch (error: any) {
+      console.error("Login error:", error);
+
+      // Handle specific Appwrite errors
+      let errorMessage = "Login failed. Please try again.";
+
+      if (error.code === 401) {
+        errorMessage =
+          "Invalid email or password. Please check your credentials.";
+      } else if (error.code === 429) {
+        errorMessage = "Too many login attempts. Please try again later.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   const handleSocialLogin = (provider: string) => {
     // Social login will be configured in Supabase dashboard
     console.log(
@@ -130,12 +212,20 @@ export default function LoginPage() {
                   type='email'
                   required
                   placeholder='your@email.com'
-                  className='pl-10 h-12 border-2 border-border bg-background focus:border-emerald-500 dark:focus:border-emerald-400 transition-colors'
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({...formData, email: e.target.value})
-                  }
+                  className={`pl-10 h-12 border-2 bg-background focus:border-emerald-500 dark:focus:border-emerald-400 transition-colors ${
+                    errors.email ? "border-red-500" : "border-border"
+                  }`}
+                  value={email}
+                  onChange={(e) => handleEmailChange(e.target.value)}
                 />
+                {errors.email && (
+                  <p
+                    className='mt-1 text-sm text-red-500'
+                    role='alert'
+                    aria-live='polite'>
+                    {errors.email}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -157,16 +247,17 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   required
                   placeholder='Enter your password'
-                  className='pl-10 pr-10 h-12 border-2 border-border bg-background focus:border-emerald-500 dark:focus:border-emerald-400 transition-colors'
-                  value={formData.password}
-                  onChange={(e) =>
-                    setFormData({...formData, password: e.target.value})
-                  }
+                  className={`pl-10 pr-10 h-12 border-2 bg-background focus:border-emerald-500 dark:focus:border-emerald-400 transition-colors ${
+                    errors.password ? "border-red-500" : "border-border"
+                  }`}
+                  value={password}
+                  onChange={(e) => handlePasswordChange(e.target.value)}
                 />
                 <button
                   type='button'
                   onClick={() => setShowPassword(!showPassword)}
-                  className='absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors'>
+                  className='absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors'
+                  aria-label={showPassword ? "Hide password" : "Show password"}>
                   {showPassword ? (
                     <EyeOff className='w-5 h-5' />
                   ) : (
@@ -174,13 +265,21 @@ export default function LoginPage() {
                   )}
                 </button>
               </div>
+              {errors.password && (
+                <p
+                  className='mt-1 text-sm text-red-500'
+                  role='alert'
+                  aria-live='polite'>
+                  {errors.password}
+                </p>
+              )}
             </div>
 
             <Button
               type='submit'
               className='w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 h-12 text-base text-white shadow-lg hover:shadow-xl transition-all duration-300 btn-hover-lift'
-              disabled={loading}>
-              Sign In
+              disabled={isLoading}>
+              {isLoading ? "Signing In..." : "Sign In"}
               <ArrowRight className='w-5 h-5 ml-2' />
             </Button>
           </form>
@@ -215,4 +314,6 @@ export default function LoginPage() {
       </div>
     </div>
   );
-}
+};
+
+export default LoginPage;
