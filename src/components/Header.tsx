@@ -165,7 +165,7 @@ export default function Header() {
   ];
 
   return (
-    <header className='fixed top-0 left-0 right-0 z-50 bg-background border-b border-border shadow-sm transition-colors duration-300'>
+    <header className='sticky top-0 z-50 bg-background border-b border-border shadow-sm transition-colors duration-300'>
       <div className='w-full px-4 md:max-w-7xl md:mx-auto md:px-6 lg:px-8'>
         <div className='flex justify-between items-center h-16 md:h-18'>
           {/* Logo - Mobile First */}

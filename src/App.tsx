@@ -39,7 +39,7 @@ export default function App() {
         <AppwriteAuthProvider>
           <div className='min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300'>
             <Header />
-            <main className='flex-1 pt-16 md:pt-18'>
+            <main className='flex-1'>
               <Routes>
                 <Route path='/' element={<HomePage />} />
                 <Route path='/categories' element={<CategoriesPage />} />
