@@ -82,9 +82,59 @@ const topServices = [
   },
 ];
 
+// Top categories for dropdown menu
+const topCategories = [
+  {
+    id: "cleaning",
+    name: "Cleaning Services",
+    description: "Professional home & office cleaning",
+    icon: Sparkles,
+    color: "text-emerald-600",
+    bgColor: "bg-emerald-50",
+    serviceCount: "12+ services",
+  },
+  {
+    id: "maintenance",
+    name: "Home Maintenance",
+    description: "Repairs, fixes & maintenance work",
+    icon: Wrench,
+    color: "text-orange-600",
+    bgColor: "bg-orange-50",
+    serviceCount: "15+ services",
+  },
+  {
+    id: "utilities",
+    name: "Utilities & Systems",
+    description: "Plumbing, electrical & HVAC services",
+    icon: Zap,
+    color: "text-blue-600",
+    bgColor: "bg-blue-50",
+    serviceCount: "18+ services",
+  },
+  {
+    id: "beauty",
+    name: "Beauty & Wellness",
+    description: "Personal care & beauty services",
+    icon: Paintbrush,
+    color: "text-pink-600",
+    bgColor: "bg-pink-50",
+    serviceCount: "8+ services",
+  },
+  {
+    id: "transportation",
+    name: "Transportation",
+    description: "Moving, delivery & vehicle services",
+    icon: Droplet,
+    color: "text-purple-600",
+    bgColor: "bg-purple-50",
+    serviceCount: "6+ services",
+  },
+];
+
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
+  const [categoriesDropdownOpen, setCategoriesDropdownOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const {user, profile, signOut} = useAppwriteAuth();
@@ -96,7 +146,18 @@ export default function Header() {
   };
 
   const navLinks = [
-    {name: "Services", path: "/categories", hasDropdown: true},
+    {
+      name: "Categories",
+      path: "/categories",
+      hasDropdown: true,
+      dropdownType: "categories",
+    },
+    {
+      name: "Services",
+      path: "/services",
+      hasDropdown: true,
+      dropdownType: "services",
+    },
     {name: "About", path: "/about", hasDropdown: false},
     {name: "Blog", path: "/blog", hasDropdown: false},
     {name: "FAQ", path: "/faq", hasDropdown: false},
@@ -125,12 +186,26 @@ export default function Header() {
               <div
                 key={link.path}
                 className='relative'
-                onMouseEnter={() =>
-                  link.hasDropdown && setServicesDropdownOpen(true)
-                }
-                onMouseLeave={() =>
-                  link.hasDropdown && setServicesDropdownOpen(false)
-                }>
+                onMouseEnter={() => {
+                  if (link.hasDropdown) {
+                    if (link.dropdownType === "categories") {
+                      setCategoriesDropdownOpen(true);
+                      setServicesDropdownOpen(false);
+                    } else if (link.dropdownType === "services") {
+                      setServicesDropdownOpen(true);
+                      setCategoriesDropdownOpen(false);
+                    }
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (link.hasDropdown) {
+                    if (link.dropdownType === "categories") {
+                      setCategoriesDropdownOpen(false);
+                    } else if (link.dropdownType === "services") {
+                      setServicesDropdownOpen(false);
+                    }
+                  }
+                }}>
                 <Link
                   to={link.path}
                   className={`flex items-center space-x-1 px-4 py-2 rounded-full transition-all duration-300 ${
@@ -142,63 +217,124 @@ export default function Header() {
                   {link.hasDropdown && (
                     <ChevronDown
                       className={`w-4 h-4 transition-transform ${
-                        servicesDropdownOpen ? "rotate-180" : ""
+                        (link.dropdownType === "categories" &&
+                          categoriesDropdownOpen) ||
+                        (link.dropdownType === "services" &&
+                          servicesDropdownOpen)
+                          ? "rotate-180"
+                          : ""
                       }`}
                     />
                   )}
                 </Link>
 
-                {/* Services Dropdown */}
-                {link.hasDropdown && servicesDropdownOpen && (
-                  <div className='absolute top-full left-0 mt-1 w-80 bg-card border border-border rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200'>
-                    <div className='p-3 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border-b border-border'>
-                      <h3 className='text-sm text-foreground'>
-                        Popular Services
-                      </h3>
-                      <p className='text-xs text-muted-foreground mt-0.5'>
-                        Company-employed professionals
-                      </p>
-                    </div>
-                    <div className='py-2'>
-                      {topServices.map((service) => {
-                        const Icon = service.icon;
-                        return (
-                          <Link
-                            key={service.id}
-                            to={`/service/${service.id}`}
-                            className='flex items-start space-x-3 px-4 py-3 hover:bg-accent transition-all duration-200 group rounded-lg mx-2'
-                            onClick={() => setServicesDropdownOpen(false)}>
-                            <div
-                              className={`${service.bgColor} dark:bg-opacity-20 ${service.color} p-2.5 rounded-xl group-hover:scale-110 transition-transform duration-300`}>
-                              <Icon className='w-5 h-5' />
-                            </div>
-                            <div className='flex-1 min-w-0'>
-                              <div className='flex items-center justify-between'>
-                                <h4 className='text-sm text-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors'>
-                                  {service.name}
-                                </h4>
+                {/* Categories Dropdown */}
+                {link.hasDropdown &&
+                  link.dropdownType === "categories" &&
+                  categoriesDropdownOpen && (
+                    <div className='absolute top-full left-0 mt-1 w-80 bg-card border border-border rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200'>
+                      <div className='p-3 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border-b border-border'>
+                        <h3 className='text-sm font-medium text-foreground'>
+                          Service Categories
+                        </h3>
+                        <p className='text-xs text-muted-foreground mt-0.5'>
+                          Browse services by category
+                        </p>
+                      </div>
+                      <div className='py-2'>
+                        {topCategories.map((category) => {
+                          const Icon = category.icon;
+                          return (
+                            <Link
+                              key={category.id}
+                              to={`/categories?category=${category.id}`}
+                              className='flex items-start space-x-3 px-4 py-3 hover:bg-accent transition-all duration-200 group rounded-lg mx-2'
+                              onClick={() => setCategoriesDropdownOpen(false)}>
+                              <div
+                                className={`${category.bgColor} dark:bg-opacity-20 ${category.color} p-2.5 rounded-xl group-hover:scale-110 transition-transform duration-300`}>
+                                <Icon className='w-5 h-5' />
                               </div>
-                              <p className='text-xs text-muted-foreground mt-0.5 line-clamp-1'>
-                                {service.description}
-                              </p>
-                              <p className='text-xs text-emerald-600 dark:text-emerald-400 mt-1'>
-                                {service.price}
-                              </p>
-                            </div>
-                          </Link>
-                        );
-                      })}
+                              <div className='flex-1 min-w-0'>
+                                <div className='flex items-center justify-between'>
+                                  <h4 className='text-sm font-medium text-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors'>
+                                    {category.name}
+                                  </h4>
+                                </div>
+                                <p className='text-xs text-muted-foreground mt-0.5 line-clamp-1'>
+                                  {category.description}
+                                </p>
+                                <p className='text-xs text-emerald-600 dark:text-emerald-400 mt-1'>
+                                  {category.serviceCount}
+                                </p>
+                              </div>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                      <div className='p-3 bg-accent/50 border-t border-border'>
+                        <Link
+                          to='/categories'
+                          className='block text-center text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors'
+                          onClick={() => setCategoriesDropdownOpen(false)}>
+                          View All Categories →
+                        </Link>
+                      </div>
                     </div>
-                    <div className='p-3 bg-accent/50 border-t border-border'>
-                      <Link
-                        to='/categories'
-                        className='block text-center text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors'
-                        onClick={() => setServicesDropdownOpen(false)}>
-                        View All Services →
-                      </Link>
+                  )}
+
+                {/* Services Dropdown */}
+                {link.hasDropdown &&
+                  link.dropdownType === "services" &&
+                  servicesDropdownOpen && (
+                    <div className='absolute top-full left-0 mt-1 w-80 bg-card border border-border rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200'>
+                      <div className='p-3 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border-b border-border'>
+                        <h3 className='text-sm font-medium text-foreground'>
+                          Popular Services
+                        </h3>
+                        <p className='text-xs text-muted-foreground mt-0.5'>
+                          Company-employed professionals
+                        </p>
+                      </div>
+                      <div className='py-2'>
+                        {topServices.map((service) => {
+                          const Icon = service.icon;
+                          return (
+                            <Link
+                              key={service.id}
+                              to={`/service/${service.id}`}
+                              className='flex items-start space-x-3 px-4 py-3 hover:bg-accent transition-all duration-200 group rounded-lg mx-2'
+                              onClick={() => setServicesDropdownOpen(false)}>
+                              <div
+                                className={`${service.bgColor} dark:bg-opacity-20 ${service.color} p-2.5 rounded-xl group-hover:scale-110 transition-transform duration-300`}>
+                                <Icon className='w-5 h-5' />
+                              </div>
+                              <div className='flex-1 min-w-0'>
+                                <div className='flex items-center justify-between'>
+                                  <h4 className='text-sm font-medium text-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors'>
+                                    {service.name}
+                                  </h4>
+                                </div>
+                                <p className='text-xs text-muted-foreground mt-0.5 line-clamp-1'>
+                                  {service.description}
+                                </p>
+                                <p className='text-xs text-emerald-600 dark:text-emerald-400 mt-1'>
+                                  {service.price}
+                                </p>
+                              </div>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                      <div className='p-3 bg-accent/50 border-t border-border'>
+                        <Link
+                          to='/services'
+                          className='block text-center text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors'
+                          onClick={() => setServicesDropdownOpen(false)}>
+                          View All Services →
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
               </div>
             ))}
           </nav>
@@ -319,8 +455,37 @@ export default function Header() {
                     {link.hasDropdown && <ChevronDown className='w-4 h-4' />}
                   </Link>
 
+                  {/* Mobile Categories List - Touch Optimized */}
+                  {link.hasDropdown && link.dropdownType === "categories" && (
+                    <div className='mt-2 ml-2 space-y-1 bg-accent/30 rounded-xl p-2'>
+                      {topCategories.map((category) => {
+                        const Icon = category.icon;
+                        return (
+                          <Link
+                            key={category.id}
+                            to={`/categories?category=${category.id}`}
+                            className='flex items-center space-x-3 px-3 py-3 rounded-xl hover:bg-accent active:bg-accent/80 transition-all duration-300 touch-manipulation'
+                            onClick={() => setMobileMenuOpen(false)}>
+                            <div
+                              className={`${category.bgColor} dark:bg-opacity-20 ${category.color} p-2.5 rounded-xl flex-shrink-0`}>
+                              <Icon className='w-5 h-5' />
+                            </div>
+                            <div className='flex-1 min-w-0'>
+                              <h4 className='text-sm font-medium text-foreground'>
+                                {category.name}
+                              </h4>
+                              <p className='text-xs text-emerald-600 dark:text-emerald-400 mt-0.5'>
+                                {category.serviceCount}
+                              </p>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+
                   {/* Mobile Services List - Touch Optimized */}
-                  {link.hasDropdown && (
+                  {link.hasDropdown && link.dropdownType === "services" && (
                     <div className='mt-2 ml-2 space-y-1 bg-accent/30 rounded-xl p-2'>
                       {topServices.map((service) => {
                         const Icon = service.icon;
