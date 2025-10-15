@@ -9,7 +9,7 @@ export enum Role {
   ADMIN = "admin",
 }
 
-export enum Status {
+export enum BookingStatus {
   PENDING = "pending",
   CONFIRMED = "confirmed",
   IN_PROGRESS = "in_progress",
@@ -33,7 +33,7 @@ export enum PaymentMethod {
   DIGITAL_WALLET = "digital_wallet",
 }
 
-export enum Status {
+export enum PaymentStatus {
   PENDING = "pending",
   PROCESSING = "processing",
   COMPLETED = "completed",
@@ -54,7 +54,7 @@ export enum DiscountType {
   FIXED_AMOUNT = "fixed_amount",
 }
 
-export enum Status {
+export enum ContactInquiryStatus {
   NEW = "new",
   IN_PROGRESS = "in_progress",
   RESOLVED = "resolved",
@@ -123,7 +123,7 @@ export type Bookings = Models.Document & {
   professional_id: string | null;
   address_id: string;
   scheduled_datetime: string;
-  status: Status;
+  status: BookingStatus;
   total_amount: number;
   currency: string;
 };
@@ -145,7 +145,7 @@ export type Payments = Models.Document & {
   customer_id: string;
   amount: number;
   payment_method: PaymentMethod;
-  status: Status;
+  status: PaymentStatus;
   transaction_id: string | null;
 };
 
@@ -196,7 +196,7 @@ export type ContactInquiries = Models.Document & {
   email: string;
   subject: string;
   message: string;
-  status: Status;
+  status: ContactInquiryStatus;
 };
 
 export type ServicePackages = Models.Document & {

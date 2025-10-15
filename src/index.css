@@ -262,6 +262,7 @@
 
   html, :host {
     -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
     tab-size: 4;
     line-height: 1.5;
     font-family: var(--default-font-family, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");
@@ -350,7 +351,6 @@
   }
 
   img, svg, video, canvas, audio, iframe, embed, object {
-    vertical-align: middle;
     display: block;
   }
 
@@ -7163,6 +7163,7 @@ html {
 
 input[type="text"], input[type="email"], input[type="tel"], input[type="password"], input[type="number"], input[type="search"], input[type="url"], input[type="date"], textarea, select {
   -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   font-size: 16px;
 }
 
@@ -7678,4 +7679,10 @@ input[type="text"], input[type="email"], input[type="tel"], input[type="password
   to {
     height: 0;
   }
+}
+
+/* Custom background pattern */
+.bg-dot-pattern {
+  background-image: radial-gradient(circle at 20px 20px, currentColor 1px, transparent 0);
+  background-size: 40px 40px;
 }

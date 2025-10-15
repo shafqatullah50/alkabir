@@ -1,3 +1,4 @@
+import {useState, useEffect} from "react";
 import {Link} from "react-router-dom";
 import {
   Sparkles,
@@ -16,101 +17,139 @@ import {
   Car,
   ArrowRight,
 } from "lucide-react";
+import {databases, DATABASE_ID, COLLECTIONS} from "../../utils/appwrite/client";
+import {Query} from "appwrite";
+import {type ServiceCategories} from "../../types/database";
 
-const categories = [
+// Icon mapping for database icon names to Lucide components
+const iconMapping: Record<string, any> = {
+  Sparkles: Sparkles,
+  Wrench: Wrench,
+  Droplets: Droplets,
+  Zap: Zap,
+  Bug: Bug,
+  PaintBucket: PaintBucket,
+  Truck: Truck,
+  Package: Package,
+  Wind: Wind,
+  Computer: Computer,
+  Trees: Trees,
+  Hammer: Hammer,
+  Refrigerator: Refrigerator,
+  Car: Car,
+};
+
+// Fallback categories array (updated without colors)
+const fallbackCategories = [
   {
     id: "cleaning",
     name: "Cleaning",
     icon: Sparkles,
-    color: "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400",
   },
   {
     id: "repairs",
     name: "Repairs",
     icon: Wrench,
-    color:
-      "bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400",
   },
   {
     id: "plumbing",
     name: "Plumbing",
     icon: Droplets,
-    color: "bg-cyan-100 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400",
   },
   {
     id: "electrical",
     name: "Electrical",
     icon: Zap,
-    color:
-      "bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400",
   },
   {
     id: "pest-control",
     name: "Pest Control",
     icon: Bug,
-    color:
-      "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400",
   },
   {
     id: "painting",
     name: "Painting",
     icon: PaintBucket,
-    color:
-      "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400",
   },
   {
     id: "moving",
     name: "Moving",
     icon: Truck,
-    color: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
   },
   {
     id: "assembly",
     name: "Assembly",
     icon: Package,
-    color:
-      "bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400",
-  },
-  {
-    id: "deep-cleaning",
-    name: "Deep Cleaning",
-    icon: Wind,
-    color: "bg-teal-100 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400",
-  },
-  {
-    id: "it-support",
-    name: "IT Support",
-    icon: Computer,
-    color: "bg-gray-100 text-gray-600 dark:bg-gray-900/30 dark:text-gray-400",
-  },
-  {
-    id: "gardening",
-    name: "Gardening",
-    icon: Trees,
-    color: "bg-lime-100 text-lime-600 dark:bg-lime-900/30 dark:text-lime-400",
-  },
-  {
-    id: "handyman",
-    name: "Handyman",
-    icon: Hammer,
-    color:
-      "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400",
-  },
-  {
-    id: "appliance",
-    name: "Appliance Repair",
-    icon: Refrigerator,
-    color: "bg-sky-100 text-sky-600 dark:bg-sky-900/30 dark:text-sky-400",
-  },
-  {
-    id: "car-wash",
-    name: "Car Wash",
-    icon: Car,
-    color: "bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400",
   },
 ];
 
+interface Category {
+  id: string;
+  name: string;
+  icon: any;
+  icon_url?: string | null;
+  image_url?: string | null;
+}
+
+// Loading skeleton component
+const CategorySkeleton = ({isMobile = false}: {isMobile?: boolean}) => (
+  <div
+    className={`bg-card border border-border rounded-xl ${
+      isMobile ? "p-4" : "p-6"
+    } text-center animate-pulse`}>
+    <div
+      className={`bg-muted ${
+        isMobile ? "w-20 h-20" : "w-24 h-24"
+      } rounded-full mx-auto ${isMobile ? "mb-3" : "mb-4"}`}
+    />
+    <div
+      className={`bg-muted ${isMobile ? "h-3" : "h-4"} rounded mx-auto w-3/5`}
+    />
+  </div>
+);
+
 export default function FeaturedCategories() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch categories from Appwrite
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoading(true);
+        const response = await databases.listDocuments(
+          DATABASE_ID,
+          COLLECTIONS.SERVICE_CATEGORIES,
+          [Query.equal("is_active", true), Query.orderAsc("display_order")]
+        );
+
+        // Transform database data to component format using proper types
+        const transformedCategories: Category[] = response.documents.map(
+          (doc: any) => ({
+            id: doc.slug || doc.$id,
+            name: doc.name,
+            icon: iconMapping[doc.icon_url || ""] || Wrench, // fallback to Wrench icon
+            icon_url: doc.icon_url,
+            image_url: doc.image_url,
+          })
+        );
+
+        setCategories(transformedCategories);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+        setError("Failed to load categories");
+        // Use fallback categories on error
+        setCategories(fallbackCategories);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
   return (
     <section className='py-12 md:py-16 bg-background transition-colors duration-300'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
@@ -121,71 +160,135 @@ export default function FeaturedCategories() {
             Browse our wide range of professional services for your home and
             office
           </p>
+          {error && (
+            <p className='text-sm text-red-600 dark:text-red-400 mt-2'>
+              {error} - Showing default categories
+            </p>
+          )}
         </div>
 
         {/* Category Cards Grid */}
-        {/* Mobile: Show only 3 cards */}
-        <div className='grid grid-cols-3 gap-3 mb-6 md:hidden'>
-          {categories.slice(0, 3).map((category) => {
-            const Icon = category.icon;
-            return (
-              <Link
-                key={category.id}
-                to={`/service/${category.id}`}
-                className='group block'>
-                <div className='bg-card border border-border rounded-xl p-4 text-center hover:shadow-lg hover:border-emerald-300 dark:hover:border-emerald-600 transition-all duration-300 transform hover:-translate-y-1 active:scale-95'>
-                  <div
-                    className={`${category.color} w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform duration-300`}>
-                    <Icon className='w-7 h-7' />
-                  </div>
-                  <h3 className='text-xs leading-tight'>{category.name}</h3>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
+        {/* Loading State */}
+        {loading ? (
+          <>
+            {/* Mobile: Show loading skeletons */}
+            <div className='grid grid-cols-3 gap-4 mb-6 md:hidden'>
+              {[1, 2, 3].map((i) => (
+                <CategorySkeleton key={i} isMobile={true} />
+              ))}
+            </div>
 
-        {/* Tablet & Desktop: Show all cards */}
-        <div className='hidden md:grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 mb-8'>
-          {categories.map((category) => {
-            const Icon = category.icon;
-            return (
-              <Link
-                key={category.id}
-                to={`/service/${category.id}`}
-                className='group'>
-                <div className='bg-card border border-border rounded-xl p-6 text-center hover:shadow-lg hover:border-emerald-300 dark:hover:border-emerald-600 transition-all duration-300 transform hover:-translate-y-1 card-hover'>
-                  <div
-                    className={`${category.color} w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300`}>
-                    <Icon className='w-8 h-8' />
-                  </div>
-                  <h3 className='text-sm'>{category.name}</h3>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
+            {/* Desktop: Show loading skeletons */}
+            <div className='hidden md:grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 mb-8'>
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <CategorySkeleton key={i} isMobile={false} />
+              ))}
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Mobile: Show only 3 cards */}
+            <div className='grid grid-cols-3 gap-4 mb-6 md:hidden'>
+              {categories.slice(0, 3).map((category) => {
+                const Icon = category.icon;
+                return (
+                  <Link
+                    key={category.id}
+                    to={`/service/${category.id}`}
+                    className='group block'>
+                    <div className='bg-card border border-border rounded-xl p-5 text-center hover:shadow-lg hover:border-primary/50 transition-all duration-300 transform hover:-translate-y-1 active:scale-95'>
+                      <div className='w-20 h-20 rounded-full overflow-hidden mx-auto mb-3 group-hover:scale-110 transition-transform duration-300 bg-gray-50 dark:bg-gray-800 flex items-center justify-center'>
+                        {category.image_url ? (
+                          <img
+                            src={category.image_url}
+                            alt={category.name}
+                            className='w-full h-full object-cover'
+                            loading='lazy'
+                          />
+                        ) : category.icon_url ? (
+                          <img
+                            src={category.icon_url}
+                            alt={category.name}
+                            className='w-12 h-12 object-contain'
+                            loading='lazy'
+                          />
+                        ) : (
+                          <Icon className='w-12 h-12 text-muted-foreground' />
+                        )}
+                      </div>
+                      <h3 className='text-xs leading-tight text-foreground'>
+                        {category.name}
+                      </h3>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Tablet & Desktop: Show all cards */}
+            <div className='hidden md:grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 mb-8'>
+              {categories.map((category) => {
+                const Icon = category.icon;
+                return (
+                  <Link
+                    key={category.id}
+                    to={`/service/${category.id}`}
+                    className='group'>
+                    <div className='bg-card border border-border rounded-xl p-8 text-center hover:shadow-lg hover:border-primary/50 transition-all duration-300 transform hover:-translate-y-1 card-hover'>
+                      <div className='w-24 h-24 rounded-full overflow-hidden mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 bg-gray-50 dark:bg-gray-800 flex items-center justify-center'>
+                        {category.image_url ? (
+                          <img
+                            src={category.image_url}
+                            alt={category.name}
+                            className='w-full h-full object-cover'
+                            loading='lazy'
+                          />
+                        ) : category.icon_url ? (
+                          <img
+                            src={category.icon_url}
+                            alt={category.name}
+                            className='w-14 h-14 object-contain'
+                            loading='lazy'
+                          />
+                        ) : (
+                          <Icon className='w-14 h-14 text-muted-foreground' />
+                        )}
+                      </div>
+                      <h3 className='text-sm text-foreground'>
+                        {category.name}
+                      </h3>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </>
+        )}
 
         {/* View All Services Button */}
-        {/* Mobile: Prominent button */}
-        <div className='md:hidden'>
-          <Link to='/categories' className='block'>
-            <button className='w-full bg-emerald-600 dark:bg-emerald-500 text-white py-4 px-6 rounded-full hover:bg-emerald-700 dark:hover:bg-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-95 flex items-center justify-center gap-2'>
-              <span>View All Services</span>
-              <ArrowRight className='w-5 h-5' />
-            </button>
-          </Link>
-        </div>
+        {!loading && (
+          <>
+            {/* Mobile: Prominent button */}
+            <div className='md:hidden'>
+              <Link to='/categories' className='block'>
+                <button className='w-full bg-primary text-primary-foreground py-4 px-6 rounded-full hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-95 flex items-center justify-center gap-2'>
+                  <span>View All Services</span>
+                  <ArrowRight className='w-5 h-5' />
+                </button>
+              </Link>
+            </div>
 
-        {/* Desktop: Text link */}
-        <div className='hidden md:block text-center'>
-          <Link to='/categories'>
-            <button className='text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 underline transition-colors inline-flex items-center gap-2'>
-              <span>View All Services</span>
-              <ArrowRight className='w-4 h-4' />
-            </button>
-          </Link>
-        </div>
+            {/* Desktop: Text link */}
+            <div className='hidden md:block text-center'>
+              <Link to='/categories'>
+                <button className='text-primary hover:text-primary/80 underline transition-colors inline-flex items-center gap-2'>
+                  <span>View All Services</span>
+                  <ArrowRight className='w-4 h-4' />
+                </button>
+              </Link>
+            </div>
+          </>
+        )}
       </div>
     </section>
   );

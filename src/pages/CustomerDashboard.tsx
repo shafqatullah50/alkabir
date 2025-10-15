@@ -407,13 +407,7 @@ export default function CustomerDashboard() {
         <div className='bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 rounded-2xl shadow-sm p-8 mb-8 border border-border transition-colors duration-300 relative overflow-hidden'>
           {/* Background Pattern */}
           <div className='absolute inset-0 opacity-5'>
-            <div
-              className='absolute inset-0'
-              style={{
-                backgroundImage:
-                  "radial-gradient(circle at 20px 20px, currentColor 1px, transparent 0)",
-                backgroundSize: "40px 40px",
-              }}></div>
+            <div className='absolute inset-0 bg-dot-pattern'></div>
           </div>
 
           <div className='relative flex flex-col md:flex-row items-center md:items-start gap-6'>
@@ -452,6 +446,8 @@ export default function CustomerDashboard() {
                 accept='image/*'
                 onChange={handleImageUpload}
                 className='hidden'
+                title='Upload profile image'
+                aria-label='Upload profile image'
               />
             </div>
 
@@ -916,20 +912,29 @@ export default function CustomerDashboard() {
             </DialogHeader>
             <div className='space-y-4 py-2 sm:py-4'>
               <div>
-                <label className='block text-sm text-muted-foreground mb-2'>
+                <label
+                  htmlFor='reschedule-date'
+                  className='block text-sm text-muted-foreground mb-2'>
                   New Date
                 </label>
                 <input
+                  id='reschedule-date'
                   type='date'
+                  title='Select new date for appointment'
                   className='w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-border bg-background text-foreground rounded-lg transition-colors duration-300 text-sm'
                   min={new Date().toISOString().split("T")[0]}
                 />
               </div>
               <div>
-                <label className='block text-sm text-muted-foreground mb-2'>
+                <label
+                  htmlFor='reschedule-time'
+                  className='block text-sm text-muted-foreground mb-2'>
                   New Time
                 </label>
-                <select className='w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-border bg-background text-foreground rounded-lg transition-colors duration-300 text-sm'>
+                <select
+                  id='reschedule-time'
+                  title='Select new time slot'
+                  className='w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-border bg-background text-foreground rounded-lg transition-colors duration-300 text-sm'>
                   <option>9:00 AM - 11:00 AM</option>
                   <option>11:00 AM - 1:00 PM</option>
                   <option>1:00 PM - 3:00 PM</option>
@@ -1077,6 +1082,10 @@ export default function CustomerDashboard() {
                       key={star}
                       type='button'
                       onClick={() => setRating(star)}
+                      title={`Rate ${star} star${star > 1 ? "s" : ""}`}
+                      aria-label={`Rate ${star} star${
+                        star > 1 ? "s" : ""
+                      } out of 5`}
                       className='transition-all duration-200 hover:scale-110 focus:outline-none touch-manipulation'>
                       <Star
                         className={`w-8 h-8 sm:w-10 sm:h-10 ${

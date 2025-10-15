@@ -1,5 +1,5 @@
-import { useParams, Link } from "react-router-dom";
-import { useState } from "react";
+import {useParams, Link} from "react-router-dom";
+import {useState} from "react";
 import * as React from "react";
 import {
   Calendar,
@@ -10,8 +10,8 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { Button } from "../components/ui/button";
-import { Badge } from "../components/ui/badge";
+import {Button} from "../components/ui/button";
+import {Badge} from "../components/ui/badge";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -20,16 +20,15 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../components/ui/breadcrumb";
-import { ImageWithFallback } from "../components/figma/ImageWithFallback";
+import {ImageWithFallback} from "../components/figma/ImageWithFallback";
 
 export default function BlogPostPage() {
-  const { postId } = useParams();
+  const {postId} = useParams();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const post = {
     id: postId,
-    title:
-      "10 Essential Home Maintenance Tasks for Every Season",
+    title: "10 Essential Home Maintenance Tasks for Every Season",
     images: [
       {
         url: "https://images.unsplash.com/photo-1584677191047-38f48d0db64e?w=1200",
@@ -116,15 +115,12 @@ export default function BlogPostPage() {
   };
 
   const nextImage = () => {
-    setCurrentImageIndex(
-      (prev) => (prev + 1) % post.images.length,
-    );
+    setCurrentImageIndex((prev) => (prev + 1) % post.images.length);
   };
 
   const prevImage = () => {
     setCurrentImageIndex(
-      (prev) =>
-        (prev - 1 + post.images.length) % post.images.length,
+      (prev) => (prev - 1 + post.images.length) % post.images.length
     );
   };
 
@@ -153,54 +149,53 @@ export default function BlogPostPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background transition-colors duration-300">
+    <div className='min-h-screen bg-background transition-colors duration-300'>
       {/* Hero Section - 50-60% viewport height with carousel */}
-      <section className="relative h-[50vh] md:h-[60vh] overflow-hidden">
+      <section className='relative h-[50vh] md:h-[60vh] overflow-hidden'>
         {/* Background Image Carousel - Full Width */}
-        <div className="absolute inset-0">
+        <div className='absolute inset-0'>
           <ImageWithFallback
             src={post.images[currentImageIndex].url}
             alt={post.images[currentImageIndex].alt}
-            className="w-full h-full object-cover transition-opacity duration-500"
+            className='w-full h-full object-cover transition-opacity duration-500'
           />
           {/* Dark Gradient Overlay for text contrast */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70"></div>
+          <div className='absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70'></div>
           {/* Bottom Gradient Overlay - Smooth transition to section below */}
-          <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-background via-background/95 to-transparent transition-colors duration-300"></div>
+          <div className='absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-background via-background/95 to-transparent transition-colors duration-300'></div>
         </div>
 
         {/* Content Container - With site-wide horizontal padding */}
-        <div className="relative h-full w-full px-4 md:max-w-7xl md:mx-auto md:px-6 lg:px-8 flex flex-col">
+        <div className='relative h-full w-full px-4 md:max-w-7xl md:mx-auto md:px-6 lg:px-8 flex flex-col'>
           {/* Breadcrumb - Inside Hero, No Background */}
-          <div className="py-3 md:py-4 z-20">
+          <div className='py-3 md:py-4 z-20'>
             <Breadcrumb>
-              <BreadcrumbList className="items-center">
+              <BreadcrumbList className='items-center'>
                 {[
-                  { label: "Home", href: "/" },
-                  { label: "Blog", href: "/blog" },
-                  { label: post.category },
+                  {label: "Home", href: "/"},
+                  {label: "Blog", href: "/blog"},
+                  {label: post.category},
                 ].map((segment, index) => {
                   const isLast = index === 2;
                   return (
                     <React.Fragment key={index}>
-                      <BreadcrumbItem className="font-[Alan_Sans] flex items-center justify-center">
+                      <BreadcrumbItem className='font-[Alan_Sans] flex items-center justify-center'>
                         {isLast ? (
-                          <BreadcrumbPage className="text-white/90 font-medium">
+                          <BreadcrumbPage className='text-white/90 font-medium'>
                             {segment.label}
                           </BreadcrumbPage>
                         ) : (
                           <BreadcrumbLink asChild>
                             <Link
                               to={segment.href || "#"}
-                              className="text-white/70 hover:text-white transition-colors font-medium"
-                            >
+                              className='text-white/70 hover:text-white transition-colors font-medium'>
                               {segment.label}
                             </Link>
                           </BreadcrumbLink>
                         )}
                       </BreadcrumbItem>
                       {!isLast && (
-                        <BreadcrumbSeparator className="text-white/50" />
+                        <BreadcrumbSeparator className='text-white/50' />
                       )}
                     </React.Fragment>
                   );
@@ -214,31 +209,29 @@ export default function BlogPostPage() {
             <>
               <button
                 onClick={prevImage}
-                className="absolute left-4 md:left-6 lg:left-8 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm text-foreground w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center hover:bg-white dark:hover:bg-gray-800 transition-all duration-300 hover:scale-110 shadow-lg z-10 touch-manipulation"
-                aria-label="Previous image"
-              >
-                <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+                className='absolute left-4 md:left-6 lg:left-8 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm text-foreground w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center hover:bg-white dark:hover:bg-gray-800 transition-all duration-300 hover:scale-110 shadow-lg z-10 touch-manipulation'
+                aria-label='Previous image'>
+                <ChevronLeft className='w-5 h-5 md:w-6 md:h-6' />
               </button>
               <button
                 onClick={nextImage}
-                className="absolute right-4 md:right-6 lg:right-8 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm text-foreground w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center hover:bg-white dark:hover:bg-gray-800 transition-all duration-300 hover:scale-110 shadow-lg z-10 touch-manipulation"
-                aria-label="Next image"
-              >
-                <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+                className='absolute right-4 md:right-6 lg:right-8 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm text-foreground w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center hover:bg-white dark:hover:bg-gray-800 transition-all duration-300 hover:scale-110 shadow-lg z-10 touch-manipulation'
+                aria-label='Next image'>
+                <ChevronRight className='w-5 h-5 md:w-6 md:h-6' />
               </button>
             </>
           )}
 
           {/* Image Counter - Inside container */}
           {post.images.length > 1 && (
-            <div className="absolute top-4 right-4 md:right-6 lg:right-8 bg-black/70 backdrop-blur-sm text-white px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium z-10">
+            <div className='absolute top-4 right-4 md:right-6 lg:right-8 bg-black/70 backdrop-blur-sm text-white px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium z-10'>
               {currentImageIndex + 1} / {post.images.length}
             </div>
           )}
 
           {/* Thumbnail Strip - Desktop Only, inside container */}
           {post.images.length > 1 && (
-            <div className="hidden md:flex absolute bottom-4 left-1/2 -translate-x-1/2 gap-2 z-10">
+            <div className='hidden md:flex absolute bottom-4 left-1/2 -translate-x-1/2 gap-2 z-10'>
               {post.images.map((img, index) => (
                 <button
                   key={index}
@@ -248,11 +241,14 @@ export default function BlogPostPage() {
                       ? "ring-2 ring-emerald-400 scale-110"
                       : "opacity-60 hover:opacity-100 hover:scale-105"
                   }`}
-                >
+                  aria-label={`View image ${index + 1} of ${
+                    post.images.length
+                  }`}
+                  title={`Switch to image ${index + 1}`}>
                   <ImageWithFallback
                     src={img.url}
                     alt={img.alt}
-                    className="w-full h-full object-cover"
+                    className='w-full h-full object-cover'
                   />
                 </button>
               ))}
@@ -262,65 +258,63 @@ export default function BlogPostPage() {
       </section>
 
       {/* Article Header */}
-      <article className="w-full px-4 md:max-w-7xl md:mx-auto md:px-6 lg:px-8 py-8 md:py-12">
+      <article className='w-full px-4 md:max-w-7xl md:mx-auto md:px-6 lg:px-8 py-8 md:py-12'>
         {/* Content */}
-        <div className=" mx-auto m-[0px]">
-          <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 mb-4 border border-emerald-200 dark:border-emerald-800 transition-colors duration-300">
+        <div className=' mx-auto m-[0px]'>
+          <Badge className='bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 mb-4 border border-emerald-200 dark:border-emerald-800 transition-colors duration-300'>
             {post.category}
           </Badge>
 
-          <h1 className="text-foreground mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <span className="inline-block bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 dark:from-emerald-400 dark:via-teal-400 dark:to-emerald-300 bg-clip-text text-transparent">
+          <h1 className='text-foreground mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700'>
+            <span className='inline-block bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 dark:from-emerald-400 dark:via-teal-400 dark:to-emerald-300 bg-clip-text text-transparent'>
               {post.title}
             </span>
           </h1>
 
           {/* Meta Info */}
-          <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-8 pb-8 border-b border-border transition-colors duration-300">
-            <div className="flex items-center space-x-2 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-              <User className="w-4 h-4" />
+          <div className='flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-8 pb-8 border-b border-border transition-colors duration-300'>
+            <div className='flex items-center space-x-2 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors'>
+              <User className='w-4 h-4' />
               <span>{post.author}</span>
             </div>
-            <div className="flex items-center space-x-2 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-              <Calendar className="w-4 h-4" />
+            <div className='flex items-center space-x-2 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors'>
+              <Calendar className='w-4 h-4' />
               <span>{post.date}</span>
             </div>
-            <div className="flex items-center space-x-2 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-              <Clock className="w-4 h-4" />
+            <div className='flex items-center space-x-2 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors'>
+              <Clock className='w-4 h-4' />
               <span>{post.readTime}</span>
             </div>
             <Button
-              variant="outline"
-              size="sm"
-              className="ml-auto border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700 transition-all duration-300"
-            >
-              <Share2 className="w-4 h-4 mr-2" />
+              variant='outline'
+              size='sm'
+              className='ml-auto border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700 transition-all duration-300'>
+              <Share2 className='w-4 h-4 mr-2' />
               Share
             </Button>
           </div>
 
           {/* Article Content with Custom Styling */}
           <div
-            className="blog-content text-foreground"
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            className='blog-content text-foreground'
+            dangerouslySetInnerHTML={{__html: post.content}}
           />
 
           {/* Call to Action */}
-          <div className="mt-12 p-6 md:p-8 bg-gradient-to-br from-emerald-50 via-teal-50 to-emerald-50 dark:from-emerald-950/30 dark:via-teal-950/30 dark:to-emerald-950/30 rounded-2xl text-center border border-emerald-200 dark:border-emerald-800 transition-all duration-300 hover:shadow-lg">
-            <h3 className="text-foreground mb-4">
-              <span className="inline-block bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
+          <div className='mt-12 p-6 md:p-8 bg-gradient-to-br from-emerald-50 via-teal-50 to-emerald-50 dark:from-emerald-950/30 dark:via-teal-950/30 dark:to-emerald-950/30 rounded-2xl text-center border border-emerald-200 dark:border-emerald-800 transition-all duration-300 hover:shadow-lg'>
+            <h3 className='text-foreground mb-4'>
+              <span className='inline-block bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent'>
                 Need Professional Help?
               </span>
             </h3>
-            <p className="text-muted-foreground mb-6 leading-relaxed">
-              Our verified professionals are ready to help with
-              all your home maintenance needs
+            <p className='text-muted-foreground mb-6 leading-relaxed'>
+              Our verified professionals are ready to help with all your home
+              maintenance needs
             </p>
-            <Link to="/categories">
+            <Link to='/categories'>
               <Button
-                size="lg"
-                className="bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-              >
+                size='lg'
+                className='bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105'>
                 Browse Services
               </Button>
             </Link>
@@ -328,32 +322,31 @@ export default function BlogPostPage() {
         </div>
 
         {/* Related Articles */}
-        <div className="mt-12 max-w-4xl mx-auto">
-          <h2 className="text-foreground mb-6 flex items-center">
+        <div className='mt-12 max-w-4xl mx-auto'>
+          <h2 className='text-foreground mb-6 flex items-center'>
             <span>Related Articles</span>
-            <span className="ml-3 h-0.5 flex-1 bg-gradient-to-r from-emerald-600 to-transparent dark:from-emerald-400 rounded-full"></span>
+            <span className='ml-3 h-0.5 flex-1 bg-gradient-to-r from-emerald-600 to-transparent dark:from-emerald-400 rounded-full'></span>
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
             {relatedPosts.map((related) => (
               <Link
                 key={related.id}
                 to={`/blog/${related.id}`}
-                className="group"
-              >
-                <div className="bg-card rounded-xl shadow-md overflow-hidden border border-border hover:shadow-2xl hover:border-emerald-300 dark:hover:border-emerald-700 transition-all duration-300 hover:-translate-y-2">
-                  <div className="relative overflow-hidden">
+                className='group'>
+                <div className='bg-card rounded-xl shadow-md overflow-hidden border border-border hover:shadow-2xl hover:border-emerald-300 dark:hover:border-emerald-700 transition-all duration-300 hover:-translate-y-2'>
+                  <div className='relative overflow-hidden'>
                     <ImageWithFallback
                       src={related.image}
                       alt={related.title}
-                      className="w-full h-40 md:h-48 object-cover transition-transform duration-500 group-hover:scale-110"
+                      className='w-full h-40 md:h-48 object-cover transition-transform duration-500 group-hover:scale-110'
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className='absolute inset-0 bg-gradient-to-t from-emerald-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
                   </div>
-                  <div className="p-4">
-                    <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 mb-2 border border-emerald-200 dark:border-emerald-800 transition-colors duration-300">
+                  <div className='p-4'>
+                    <Badge className='bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 mb-2 border border-emerald-200 dark:border-emerald-800 transition-colors duration-300'>
                       {related.category}
                     </Badge>
-                    <h3 className="text-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300">
+                    <h3 className='text-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300'>
                       {related.title}
                     </h3>
                   </div>
