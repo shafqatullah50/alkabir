@@ -30,6 +30,7 @@ import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import CareersPage from "./pages/CareersPage";
 import RefundPolicyPage from "./pages/RefundPolicyPage";
 import AuthTestPage from "./pages/AuthTestPage";
+import ServicesPage from "./pages/ServicesPage";
 
 export default function App() {
   return (
@@ -42,6 +43,7 @@ export default function App() {
               <Routes>
                 <Route path='/' element={<HomePage />} />
                 <Route path='/categories' element={<CategoriesPage />} />
+                <Route path='/services' element={<ServicesPage />} />
                 <Route
                   path='/service/:serviceId'
                   element={<ServiceDetailPage />}
